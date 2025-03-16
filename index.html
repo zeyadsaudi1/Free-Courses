@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.9/css/unicons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">  
+    <link rel="stylesheet" href="css/login.css">
+    <title>Persistent Login</title>
+</head>
+<body>
+	<div class="section">
+		<div class="container">
+			<div class="row full-height justify-content-center">
+				<div class="col-12 text-center align-self-center py-5">
+					<div class="section pb-5 pt-5 pt-sm-2 text-center">
+						<h6 class="mb-0 pb-3"><span>Log In </span><span>Sign Up</span></h6>
+			          	<input class="checkbox" type="checkbox" id="reg-log" name="reg-log"/>
+			          	<label for="reg-log"></label>
+						<div class="card-3d-wrap mx-auto">
+							<div class="card-3d-wrapper">
+								<div class="card-front">
+									<div class="center-wrap">
+										<div class="section text-center">
+											<h4 class="mb-4 pb-3">Log In</h4>
+											<div class="form-group">
+												<input type="email" id="loginEmail" class="form-style" placeholder="Email">
+												<i class="input-icon uil uil-at"></i>
+											</div>	
+											<div class="form-group mt-2 position-relative">
+                                                <input type="password" id="loginPassword" class="form-style" placeholder="Password">
+                                                <i class="input-icon uil uil-lock-alt"></i>
+                                                <button type="button" id="toggleLoginPassword" class="btn-eye">
+                                                    <i class="uil uil-eye"></i>
+                                                </button>
+                                            </div>
+											<a id="loginButton" href="#" class="btn mt-4">login</a>
+                                            <p class="mb-0 mt-4 text-center">
+                                                <a href="forgot-password.html" class="link">Forgot your password?</a>
+                                            </p>
+				      					</div>
+			      					</div>
+			      				</div>
+								<div class="card-back">
+									<div class="center-wrap">
+										<div class="section text-center">
+											<h4 class="mb-3 pb-3">Sign Up</h4>
+											<div class="form-group">
+												<input type="text" id="registerName" class="form-style" placeholder="Full Name">
+												<i class="input-icon uil uil-user"></i>
+											</div>	
+											<div class="form-group mt-2">
+												<input type="email" id="registerEmail" class="form-style" placeholder="Email">
+												<i class="input-icon uil uil-at"></i>
+											</div>
+											<div class="form-group mt-2 position-relative">
+												<input type="password" id="registerPassword" class="form-style" placeholder="Password">
+												<i class="input-icon uil uil-lock-alt"></i>
+												<button type="button" id="toggleRegisterPassword" class="btn-eye">
+                                                    <i class="uil uil-eye"></i>
+                                                </button>
+											</div>
+											<a id="registerButton" href="#" class="btn mt-4">Register</a>
+				      					</div>
+			      					</div>
+			      				</div>
+			      			</div>
+			      		</div>
+			      	</div>
+		      	</div>
+	      	</div>
+	    </div>
+	</div>
+
+    <!-- JavaScript -->
+    <script>
+        // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
+        window.onload = function () {
+            if (localStorage.getItem("loggedIn") === "true") {
+                alert("أنت بالفعل مسجل الدخول");
+                window.location.href = "home.html";
+            }
+        };
+
+        // زر التسجيل
+        document.getElementById("registerButton").addEventListener("click", function (e) {
+            e.preventDefault(); // لمنع إعادة تحميل الصفحة
+
+            const name = document.getElementById("registerName").value.trim();
+            const email = document.getElementById("registerEmail").value.trim();
+            const password = document.getElementById("registerPassword").value.trim();
+
+            if (!name || !email || !password) {
+                alert("يرجى إدخال جميع البيانات المطلوبة!");
+                return;
+            }
+
+            // الحصول على الـ Array أو إنشاؤه
+            let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+            // التأكد إذا كان البريد موجود مسبقًا
+            const accountExists = accounts.some(acc => acc.email === email);
+            if (accountExists) {
+                alert("هذا البريد الإلكتروني مسجل بالفعل!");
+                return;
+            }
+
+            // إضافة الحساب الجديد
+            accounts.push({ name, email, password });
+            localStorage.setItem("accounts", JSON.stringify(accounts));
+            localStorage.setItem("loggedIn", "true");
+
+            console.log("تم تسجيل الحساب بنجاح!");
+            window.location.href = "home.html";
+        });
+
+        // زر تسجيل الدخول
+        document.getElementById("loginButton").addEventListener("click", function (e) {
+            e.preventDefault(); // لمنع إعادة تحميل الصفحة
+
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+
+            // جلب الحسابات من LocalStorage
+            const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+            // البحث عن الحساب
+            const validAccount = accounts.find(acc => acc.email === email && acc.password === password);
+
+            if (validAccount) {
+                localStorage.setItem("loggedIn", "true");
+                alert(`مرحبًا ${validAccount.name}!`);
+                window.location.href = "home.html";
+            } else {
+                alert("بيانات تسجيل الدخول غير صحيحة!");
+            }
+        });
+
+        // إظهار وإخفاء كلمة مرور تسجيل الدخول
+        const toggleLoginPassword = document.getElementById("toggleLoginPassword");
+        const loginPasswordField = document.getElementById("loginPassword");
+
+        toggleLoginPassword.addEventListener("click", function () {
+            if (loginPasswordField.type === "password") {
+                loginPasswordField.type = "text";
+                toggleLoginPassword.innerHTML = '<i class="uil uil-eye-slash"></i>';
+            } else {
+                loginPasswordField.type = "password";
+                toggleLoginPassword.innerHTML = '<i class="uil uil-eye"></i>';
+            }
+        });
+
+        // إظهار وإخفاء كلمة مرور التسجيل
+        const toggleRegisterPassword = document.getElementById("toggleRegisterPassword");
+        const registerPasswordField = document.getElementById("registerPassword");
+
+        toggleRegisterPassword.addEventListener("click", function () {
+            if (registerPasswordField.type === "password") {
+                registerPasswordField.type = "text";
+                toggleRegisterPassword.innerHTML = '<i class="uil uil-eye-slash"></i>';
+            } else {
+                registerPasswordField.type = "password";
+                toggleRegisterPassword.innerHTML = '<i class="uil uil-eye"></i>';
+            }
+        });
+    </script>
+</body>
+</html>
